@@ -5,19 +5,27 @@
 
 int main(int argc, char *argv[])
 {
-    /*Je Crée une matrice un peu "aléatoire"*/ 
-    // TODO Deplacer dans une fonction
-    
+    // Exemple de code
     double **matrix = NULL;
-    int size;
-    SetCsvDataToDoubleMatrix(&matrix, &size, "matrix.csv");
-    
+    int size = 0;
+    if (SetCsvDataToDoubleMatrix(&matrix, &size, "matrix.csv"))
+    {
+        printf("Csv error !\n");
+        return 1;
+    }
+
     printMatrix(matrix, size);
-    if(GaussPivot(matrix,size))
-        printf("Error !?\n");
+    if (GaussPivot(matrix, size))
+    {
+        printf("GaussPivot Error !\n");
+        for (int i = 0; i < 3; ++i)
+            free(*(matrix + i));
+        free(matrix);
+        return 1;
+    }
     printf("\n");
     printMatrix(matrix, size);
-    
+
     for (int i = 0; i < 3; ++i)
         free(*(matrix + i));
     free(matrix);
