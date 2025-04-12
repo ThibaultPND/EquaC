@@ -15,7 +15,7 @@ int CountColumn(const char *line)
     }
     return count;
 }
-int GetDataFromCSV(double ***matrix, int *size, char *file_path)
+int GetMatrixFromCSV(Matrix *matrix, char *file_path)
 {
     FILE *file = fopen(file_path, "r");
     if (!file)
@@ -55,7 +55,6 @@ int GetDataFromCSV(double ***matrix, int *size, char *file_path)
         {
             column = CountColumn(buffer);
         }
-
         line++;
     }
 
@@ -66,14 +65,15 @@ int GetDataFromCSV(double ***matrix, int *size, char *file_path)
         fclose(file);
         return 1;
     }
-
     rewind(file);
 
-    *matrix = malloc(line * sizeof(double *));
+    matrix->matrix = (double**)malloc(line * sizeof(double *));
     for (int i = 0; i < line; i++)
     {
-        (*matrix)[i] = malloc(column * sizeof(double));
+        matrix->matrix[i] = malloc(column * sizeof(double));
     }
+    matrix->height = line;
+    matrix->lenght = column;
 
     line = 0;
     while (fgets(buffer, buffer_size, file))
@@ -81,7 +81,7 @@ int GetDataFromCSV(double ***matrix, int *size, char *file_path)
         char *token = strtok(buffer, ",");
         for (int col = 0; col < column && token != NULL; col++)
         {
-            (*matrix)[line][col] = atof(token);
+            (matrix->matrix)[line][col] = atof(token);
             token = strtok(NULL, ",");
         }
         line++;
@@ -90,12 +90,10 @@ int GetDataFromCSV(double ***matrix, int *size, char *file_path)
     free(buffer);
     fclose(file);
 
-    *size = line;
-
     return 0;
 }
 
-int SetDataToCSV(double **matrix, int rows, int cols, char *dst_file)
+int SetDataToCSV(Matrix matrix, char *dst_file)
 {
     FILE *file = fopen(dst_file, "w");
     if (!file)
@@ -103,13 +101,12 @@ int SetDataToCSV(double **matrix, int rows, int cols, char *dst_file)
         return 1;
     }
 
-    for (int i = 0; i < rows; i++)
+    for (int i = 0; i < matrix.height; i++)
     {
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < matrix.lenght; j++)
         {
-            fprintf(file, "%f", matrix[i][j]);
-            printf("Value[%d][%d] = %f\n", i,j, matrix[i][j]);
-            if (j < cols - 1)
+            fprintf(file, "%f", matrix.matrix[i][j]);
+            if (j < matrix.lenght - 1)
             {
                 fprintf(file, ",");
             }

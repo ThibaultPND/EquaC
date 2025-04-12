@@ -3,137 +3,157 @@
 #include <string.h>
 #include <stdlib.h>
 
-int printMatrix(double **matrix, int size)
+int printMatrix(Matrix matrix)
 {
     int i, j;
-    for (i = 0; i < size; i++)
+    for (i = 0; i < matrix.height; i++)
     {
-        for (j = 0; j < size; j++)
+        for (j = 0; j < matrix.lenght - 1; j++)
         {
-            printf("%f   ", matrix[i][j]);
+            printf("%f   ", matrix.matrix[i][j]);
         }
-        printf("|  %f\n", matrix[i][j]);
+        printf("|  %f\n", matrix.matrix[i][j]);
     }
     return 0;
 }
-int exchangeLines(double **matrix, int size, int lineA, int lineB)
+int exchangeLines(Matrix m, int lineA, int lineB)
 {
-    if (lineA > size || (lineB > size && lineA <= 0 && lineB <= 0))
+    if (lineA > m.height || lineB > m.height || lineA <= 0 || lineB <= 0)
     {
         return 1; // ! ERROR
     }
 
-    double *temp = *(matrix + lineA);
-    *(matrix + lineA) = *(matrix + lineB);
-    *(matrix + lineB) = temp;
+    double *temp = m.matrix[lineA];
+    m.matrix[lineA] = m.matrix[lineB];
+    m.matrix[lineB] = temp;
     return 0;
 }
-int FindColumnPivot(double **matrix, int size, int column)
+int FindColumnPivot(Matrix matrix, int column)
 {
-    if (column > size)
+    if (column > matrix.lenght - 1)
         return -1;
     int i = column;
-    while (matrix[i][column] == 0)
+    while (matrix.matrix[i][column] == 0)
         i++;
     return i;
 }
-void DivideLineByDouble(double *line, int size, double k)
+void DivideLineByDouble(double *line, int lenght, double k)
 {
-    for (int i = 0; i < size + 1; i++)
+    for (int i = 0; i < lenght; i++)
     {
         line[i] /= k;
     }
 }
-int SubstractLineByLineSpecial(double *line_to_substract, double *line, int size, int pivot)
+int SubstractLineByLineSpecial(double *line_to_substract, double *line, int lenght, int pivot)
 {
     double k = line_to_substract[pivot] / line[pivot];
-    for (int col = pivot; col < size + 1; col++)
+    for (int col = pivot; col < lenght; col++)
     {
         line_to_substract[col] -= line[col] * k;
     }
     return 0;
 }
-int RemoveOtherColumnCoefiscent(double **matrix, int size, int column)
+Matrix CreateMatrix(Matrix *src, int nrows, int ncols)
+{
+    Matrix matrix = {NULL, nrows, ncols};
+    matrix.matrix = (double **)malloc(nrows * sizeof(double *));
+    for (int i = 0; i < nrows; i++)
+    {
+        matrix.matrix[i] = (double *)malloc(ncols * sizeof(double));
+    }
+
+    if (src)
+    {
+        MatrixCopy(&matrix, src);
+    }
+
+    return matrix;
+}
+int RemoveOtherColumnCoefiscent(Matrix m, int column)
 {
     int pivot = column;
-    for (int line = 0; line < size; line++)
+    for (int line = 0; line < m.height; line++)
     {
         if (line == pivot)
             continue;
-        SubstractLineByLineSpecial(matrix[line], matrix[pivot], size, pivot);
+        SubstractLineByLineSpecial(m.matrix[line], m.matrix[pivot], m.lenght, pivot);
     }
     return 0;
 }
-int GaussPivot(double **matrix, int size)
+Matrix VoidMatrix()
 {
-    for (int column = 0; column < size; column++)
+    Matrix matrix = {NULL, 0, 0};
+    return matrix;
+}
+int GaussPivot(Matrix m)
+{
+    for (int column = 0; column < m.lenght - 1; column++)
     {
-        int pivot = FindColumnPivot(matrix, size, column);
+        int pivot = FindColumnPivot(m, column);
         if (pivot == -1) // Pivot introuvable
-            return -1;
+            return 1;
         else if (pivot > column)
-        {;
-            exchangeLines(matrix, size, pivot, column);
+        {
+            ;
+            exchangeLines(m, pivot, column);
             pivot = column;
         }
-        DivideLineByDouble(matrix[pivot], size, matrix[pivot][column]);
-        RemoveOtherColumnCoefiscent(matrix, size, column);
+        DivideLineByDouble(m.matrix[pivot], m.lenght, m.matrix[pivot][column]);
+        RemoveOtherColumnCoefiscent(m, column);
     }
     return 0;
 }
-int AugmentedMatrixCopy(double **matrix_dst, double **matrix_src, int size)
+int MatrixCopy(Matrix *dst_matrix, Matrix *src_matrix)
 {
-    for (int i = 0; i < size; ++i)
+    if (dst_matrix->height != src_matrix->height || dst_matrix->lenght != src_matrix->lenght)
+        return 1;
+
+    for (int i = 0; i < src_matrix->height; ++i)
     {
-        memcpy(*(matrix_dst + i), *(matrix_src + i), (size + 1) * sizeof(double));
+        memcpy(*(dst_matrix->matrix + i), *(src_matrix->matrix + i), (src_matrix->lenght) * sizeof(double));
     }
     return 0;
 }
-double **GetMatrixFromAugmentedMatrix(double **matrix_src, int size)
+Matrix GetMatrixFromAugmentedMatrix(const Matrix *m)
 {
-    double **matrix = (double **)malloc(size * sizeof(double *));
-    for (int i = 0; i < size; i++)
+    Matrix matrix = CreateMatrix(NULL, m->height, m->lenght - 1);
+    for (int i = 0; i < matrix.height; i++)
     {
-        *(matrix + i) = (double *)malloc(size * sizeof(double));
-        //  ↓↓↓ Je viens de découvrir cette fonction  ↓↓↓ C'EST QUOI CE POULET ?? Je suis fan
-        memcpy(matrix[i], matrix_src[i], size * sizeof(double));
+        memcpy(matrix.matrix[i], m->matrix[i], matrix.lenght * sizeof(double));
     }
     return matrix;
 }
-double **GetResultFromAugmentedMatrix(double **matrix, int size)
+Matrix GetResultFromAugmentedMatrix(const Matrix *m)
 {
-    double **result = (double **)malloc(size * sizeof(double *));
-    if (!result)
+    Matrix returned_matrix = CreateMatrix(NULL, m->height, 1);
+    for (int i = 0; i < m->height; i++)
     {
-        return NULL;
+        returned_matrix.matrix[i][0] = m->matrix[i][m->lenght - 1];
     }
-    for (int i = 0; i < size; i++)
-    {
-        result[i] = (double *)malloc(sizeof(double));
-        if (!result[i])
-            return NULL;
-        result[i][0] = matrix[i][size];
-    }
-    return result;
+
+    return returned_matrix;
 }
-/*
-It also free Augmented_Matrix and result_Matrix as well ! : )
-*/
-int FreeMatrix(double **augmented_matrix, int size)
+int FreeMatrix(Matrix *matrix)
 {
-    for (int i = 0; i < size; i++)
+    if (matrix == NULL || matrix->matrix == NULL)
+        return -1;
+
+    for (int i = 0; i < matrix->height; i++)
     {
-        free(*(augmented_matrix + i));
+        free(matrix->matrix[i]);
+        matrix->matrix[i] = NULL;
     }
-    free(augmented_matrix);
+    free(matrix->matrix);
+    matrix->matrix = NULL;
+
     return 0;
 }
-int transposeMatrix(double **dst_matrix, double **src_matrix, int rows, int cols)
+int transposeMatrix(Matrix dst_matrix, Matrix src_matrix)
 {
-    if (dst_matrix == NULL)
+    if (dst_matrix.matrix == NULL)
         return 1;
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            dst_matrix[j][i] = src_matrix[i][j];
+    for (int i = 0; i < src_matrix.height; i++)
+        for (int j = 0; j < src_matrix.lenght; j++)
+            dst_matrix.matrix[j][i] = src_matrix.matrix[i][j];
     return 0;
 }

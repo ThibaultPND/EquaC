@@ -1,18 +1,26 @@
 #if !defined(__EQU_H__)
 #define __EQU_H__
 
+typedef struct
+{
+    double **matrix;
+    int height; // Number of lines
+    int lenght; // Number of rows
+} Matrix;
+
 // Math things
-int exchangeLines(double **matrix, int size, int lineA, int lineB);
-int GaussPivot(double **matrix, int size);
-int transposeMatrix(double **dst_matrix, double **src_matrix, int rows, int cols);
+int exchangeLines(Matrix matrix, int lineA, int lineB);
+int GaussPivot(Matrix matrix);
+int transposeMatrix(Matrix dst_matrix, Matrix src_matrix);
 
 // Utils
-int printMatrix(double **matrix, int size);
-int AugmentedMatrixCopy(double **matrix_dst, double **matrix_src, int size);
-double **GetMatrixFromAugmentedMatrix(double **matrix, int size);
-double **GetResultFromAugmentedMatrix(double **matrix, int size);
+Matrix CreateMatrix(Matrix *src, int nrows, int ncols);
+int printMatrix(const Matrix matrix);
+int MatrixCopy(Matrix *dst_matrix, Matrix *src_matrix);
+Matrix GetMatrixFromAugmentedMatrix(const Matrix *m);
+Matrix GetResultFromAugmentedMatrix(const Matrix *m);
 
 // Free
-int FreeMatrix(double **augmented_matrix, int size);
+int FreeMatrix(Matrix *matrix);
 
 #endif // __EQU_H__
