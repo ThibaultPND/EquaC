@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     // Exemple de code
     double **matrix = NULL;
     int size = 0;
-    if (SetCsvDataToDoubleMatrix(&matrix, &size, "matrix.csv"))
+    if (GetDataFromCSV(&matrix, &size, "matrix.csv"))
     {
         printf("Csv error !\n");
         return 1;
@@ -26,9 +26,8 @@ int main(int argc, char *argv[])
     printf("\n");
     printMatrix(matrix, size);
 
-    for (int i = 0; i < 3; ++i)
-        free(*(matrix + i));
-    free(matrix);
+    // Memory free (very important ofc)
+    FreeMatrix(matrix, size);
 
     return 0;
 }
