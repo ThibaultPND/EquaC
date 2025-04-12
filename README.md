@@ -1,6 +1,6 @@
 # EquaC
 
-**EquaC** est un programme en C qui permet de **résoudre un système d'équations linéaires** représenté sous forme de **matrice augmentée** (système d'équations transformé en matrice). Les équations sont chargées depuis un fichier CSV, transformées en une matrice de type `double`, puis le système est résolu en utilisant la méthode du **pivot de Gauss**.
+**EquaC** est un programme en C qui permet de **résoudre un système d'équations linéaires** représenté sous forme de **matrice augmentée** (système d'équations transformé en matrice). Les équations sont chargées depuis un fichier CSV, transformées en une matrice de type `double`, puis le système est résolu en utilisant la méthode de **Gauss-Jordan**.
 
 ---
 
@@ -8,11 +8,11 @@
 
 Pour compiler le programme avec MinGW, utilisez la commande suivante :
 ```bash
-gcc -Iinclude src/*.c -o EquaC
+gcc -Iinclude src/*.c -o EquaC.exe
 ```
 - `-Iinclude` : indique à GCC de rechercher les fichiers d'en-tête dans le dossier `include/`
 - `src/*.c` : compile tous les fichiers sources du dossier `src/`
-- `-o EquaC` : génère un exécutable nommé `EquaC`
+- `-o EquaC.exe` : génère un exécutable nommé `EquaC.exe`
 
 ---
 
@@ -20,7 +20,7 @@ gcc -Iinclude src/*.c -o EquaC
 
 ### 1. Préparation du fichier CSV
 
-Le fichier CSV doit contenir **une ligne par équation**, chaque ligne comportant les coefficients suivis du terme constant, séparés par des virgules. Exemple de fichier `equations.csv` :
+Le fichier CSV doit contenir **une ligne par équation**, chaque ligne comportant les coefficients suivis du terme constant, séparés par des virgules. Exemple de fichier `matrix.csv` :
 ```csv
 1,1.02,1,6  
 2,3,1,14  
@@ -35,11 +35,10 @@ Ce fichier représente le système :
 
 Utilisez la fonction suivante pour charger les données du CSV dans une matrice dynamique :
 ```c
-int SetCsvDataToDoubleMatrix(double ***matrix, int *size, char *file_path);
+int GetMatrixFromCSV(Matrix *matrix, char *file_path);
 ```
 
-- **matrix** : adresse d'un pointeur vers la matrice (initialement `NULL`)
-- **size** : adresse d'un entier qui contiendra le nombre de lignes (équations)
+- **matrix** : adresse vers la matrice (initialement matrix.matrix = `NULL`)
 - **file_path** : chemin vers le fichier CSV
 
 Cette fonction parse le CSV, alloue dynamiquement la matrice et remplit les valeurs.
@@ -48,7 +47,7 @@ Cette fonction parse le CSV, alloue dynamiquement la matrice et remplit les vale
 
 Une fois la matrice chargée, résolvez le système en appelant :
 ```c
-GaussPivot(double **matrix, int size);
+GaussPivot(Matrix matrix);
 ```
 Cette fonction effectue le pivot de Gauss, transformant la matrice augmentée en une forme où la partie gauche devient la matrice identité. Le format final attendu est :
 ```
@@ -60,8 +59,8 @@ Cette fonction effectue le pivot de Gauss, transformant la matrice augmentée en
 
 ## 📏 Limites
 
-- **Taille maximale par ligne du CSV** : 1024 caractères (environ **200 valeurs** maximum, soit 200 équations)
-- Pour être sûr de ne pas atteindre la limite du buffer, je conseille de limiter le nombre d'équations à **180**.
+- **Taille maximale par ligne du CSV** : 1024 caractères (environ **200 valeurs** maximum, soit 170 équations)
+- Pour être sûr de ne pas atteindre la limite du buffer, je conseille de limiter le nombre d'équations à **150**.
 
 ---
 
@@ -74,24 +73,20 @@ Voici un extrait d'utilisation :
 #include "equ.h"
 #include "parseCSV.h"
 
-int main() {  
- double **matrix = NULL;  
- int size = 0;  
+int main(int argc, char *argv[])
+{
+    // Exemple de code
+    Matrix matrix;
+    GetMatrixFromCSV(&matrix, "matrix.csv")
 
- // Charger les données CSV dans la matrice  
- if (SetCsvDataToDoubleMatrix(&matrix, &size, "equations.csv") != 0) {  
-  fprintf(stderr, "Erreur lors de la lecture du fichier CSV\n");  
-  return 1;  
- }  
+    GaussPivot(matrix);
 
- // Résoudre le système par pivot de Gauss  
- GaussPivot(matrix, size);  
+    // La matrice est maintenant sous une forme identité avec les resultats à droite.
 
- // La matrice "matrix" est maintenant sous la forme [ I | solutions ]   
+    // Libération mémoire obligatoire.
+    FreeMatrix(&matrix);
 
- // TODO Libérer la mémoire allouée pour la matrice (code non montré)  
-
- return 0;  
+    return 0;
 }
 ```
 ---
