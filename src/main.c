@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     // Exemple de code
     double **matrix = NULL;
     int size = 0;
-    if (GetDataFromCSV(&matrix, &size, "matrix.csv"))
+    if (SetCsvDataToDoubleMatrix(&matrix, &size, "matrix.csv"))
     {
         printf("Csv error !\n");
         return 1;
