@@ -8,13 +8,11 @@ int main(int argc, char *argv[])
     // Exemple de code
     double **matrix = NULL;
     int size = 0;
-    if (SetCsvDataToDoubleMatrix(&matrix, &size, "matrix.csv"))
+    if (GetDataFromCSV(&matrix, &size, "matrix.csv"))
     {
         printf("Csv error !\n");
         return 1;
     }
-
-    printMatrix(matrix, size);
     if (GaussPivot(matrix, size))
     {
         printf("GaussPivot Error !\n");
@@ -23,11 +21,13 @@ int main(int argc, char *argv[])
         free(matrix);
         return 1;
     }
-    printf("\n");
-    printMatrix(matrix, size);
+
+    double **result = GetResultFromAugmentedMatrix(matrix, size);
+    SetDataToCSV(result, size, 1, "exit.csv");
 
     // Memory free (very important ofc)
     FreeMatrix(matrix, size);
+    FreeMatrix(result, size);
 
     return 0;
 }

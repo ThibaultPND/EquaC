@@ -1,6 +1,7 @@
 #include "equ.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int printMatrix(double **matrix, int size)
 {
@@ -17,7 +18,7 @@ int printMatrix(double **matrix, int size)
 }
 int exchangeLines(double **matrix, int size, int lineA, int lineB)
 {
-    if (lineA > size || lineB > size && lineA <= 0 && lineB <= 0)
+    if (lineA > size || (lineB > size && lineA <= 0 && lineB <= 0))
     {
         return 1; // ! ERROR
     }
@@ -36,11 +37,11 @@ int FindColumnPivot(double **matrix, int size, int column)
         i++;
     return i;
 }
-void DivideLineByInteger(double *line, int size, int k)
+void DivideLineByDouble(double *line, int size, double k)
 {
     for (int i = 0; i < size + 1; i++)
     {
-        line[i] /= (double)k;
+        line[i] /= k;
     }
 }
 int SubstractLineByLineSpecial(double *line_to_substract, double *line, int size, int pivot)
@@ -61,6 +62,7 @@ int RemoveOtherColumnCoefiscent(double **matrix, int size, int column)
             continue;
         SubstractLineByLineSpecial(matrix[line], matrix[pivot], size, pivot);
     }
+    return 0;
 }
 int GaussPivot(double **matrix, int size)
 {
@@ -70,12 +72,11 @@ int GaussPivot(double **matrix, int size)
         if (pivot == -1) // Pivot introuvable
             return -1;
         else if (pivot > column)
-        {
+        {;
             exchangeLines(matrix, size, pivot, column);
             pivot = column;
         }
-        printf("Integer = %f\n", matrix[pivot][column]);
-        DivideLineByInteger(matrix[pivot], size, matrix[pivot][column]);
+        DivideLineByDouble(matrix[pivot], size, matrix[pivot][column]);
         RemoveOtherColumnCoefiscent(matrix, size, column);
     }
     return 0;
@@ -86,6 +87,7 @@ int AugmentedMatrixCopy(double **matrix_dst, double **matrix_src, int size)
     {
         memcpy(*(matrix_dst + i), *(matrix_src + i), (size + 1) * sizeof(double));
     }
+    return 0;
 }
 double **GetMatrixFromAugmentedMatrix(double **matrix_src, int size)
 {
@@ -96,35 +98,36 @@ double **GetMatrixFromAugmentedMatrix(double **matrix_src, int size)
         //  ↓↓↓ Je viens de découvrir cette fonction  ↓↓↓ C'EST QUOI CE POULET ?? Je suis fan
         memcpy(matrix[i], matrix_src[i], size * sizeof(double));
     }
+    return matrix;
 }
 double **GetResultFromAugmentedMatrix(double **matrix, int size)
 {
     double **result = (double **)malloc(size * sizeof(double *));
     if (!result)
     {
-        return -1;
+        return NULL;
     }
     for (int i = 0; i < size; i++)
     {
-        *(result + i) = (double *)malloc(sizeof(double));
-        if (!*(result + i))
-            return -1;
-        *(*(result + i)) = matrix[i][size + 1];
+        result[i] = (double *)malloc(sizeof(double));
+        if (!result[i])
+            return NULL;
+        result[i][0] = matrix[i][size];
     }
     return result;
 }
 /*
 It also free Augmented_Matrix and result_Matrix as well ! : )
 */
-int FreeMatrix(int **augmented_matrix, int size)
+int FreeMatrix(double **augmented_matrix, int size)
 {
     for (int i = 0; i < size; i++)
     {
         free(*(augmented_matrix + i));
     }
     free(augmented_matrix);
+    return 0;
 }
-
 int transposeMatrix(double **dst_matrix, double **src_matrix, int rows, int cols)
 {
     if (dst_matrix == NULL)

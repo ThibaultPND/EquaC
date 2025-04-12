@@ -13,6 +13,6 @@ double **GetMatrixFromAugmentedMatrix(double **matrix, int size);
 double **GetResultFromAugmentedMatrix(double **matrix, int size);
 
 // Free
-int FreeMatrix(int **augmented_matrix, int size);
+int FreeMatrix(double **augmented_matrix, int size);
 
 #endif // __EQU_H__

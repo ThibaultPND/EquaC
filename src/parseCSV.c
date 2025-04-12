@@ -15,8 +15,7 @@ int CountColumn(const char *line)
     }
     return count;
 }
-
-int SetCsvDataToDoubleMatrix(double ***matrix, int *size, char *file_path)
+int GetDataFromCSV(double ***matrix, int *size, char *file_path)
 {
     FILE *file = fopen(file_path, "r");
     if (!file)
@@ -93,5 +92,30 @@ int SetCsvDataToDoubleMatrix(double ***matrix, int *size, char *file_path)
 
     *size = line;
 
+    return 0;
+}
+
+int SetDataToCSV(double **matrix, int rows, int cols, char *dst_file)
+{
+    FILE *file = fopen(dst_file, "w");
+    if (!file)
+    {
+        return 1;
+    }
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            fprintf(file, "%f", matrix[i][j]);
+            printf("Value[%d][%d] = %f\n", i,j, matrix[i][j]);
+            if (j < cols - 1)
+            {
+                fprintf(file, ",");
+            }
+        }
+        fprintf(file, "\n");
+    }
+    fclose(file);
     return 0;
 }
