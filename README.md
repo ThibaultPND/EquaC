@@ -35,7 +35,7 @@ Ce fichier représente le système :
 
 Utilisez la fonction suivante pour charger les données du CSV dans une matrice dynamique :
 ```c
-int GetMatrixFromCSV(Matrix *matrix, char *file_path);
+int loadMatrixFromCSV(Matrix *matrix, char *file_path);
 ```
 
 - **matrix** : adresse vers la matrice (initialement matrix.matrix = `NULL`)
@@ -47,7 +47,7 @@ Cette fonction parse le CSV, alloue dynamiquement la matrice et remplit les vale
 
 Une fois la matrice chargée, résolvez le système en appelant :
 ```c
-GaussPivot(Matrix matrix);
+gaussJordanAlgorithm(Matrix *matrix);
 ```
 Cette fonction effectue le pivot de Gauss, transformant la matrice augmentée en une forme où la partie gauche devient la matrice identité. Le format final attendu est :
 ```
@@ -70,20 +70,25 @@ Voici un extrait d'utilisation :
 ```c
 #include <stdio.h>
 #include <stdlib.h>
-#include "equ.h"
-#include "parseCSV.h"
 
-int main(int argc, char *argv[])
-{
+#include "algebra.h"
+#include "io.h"
+#include "matrix.h"
+#include "types.h"
+
+int main(int argc, char *argv[]) {
     // Exemple de code
-    Matrix matrix;
-    GetMatrixFromCSV(&matrix, "matrix.csv")
+    Matrix_t matrix;
 
-    GaussPivot(matrix);
+    loadMatrixFromCSV(&matrix, "matrix.csv");
 
-    // La matrice est maintenant sous une forme identité avec les resultats à droite.
+    // Matrice sous forme de matrice augmentée. Modélisant un système d'équations.
 
-    // Libération mémoire obligatoire.
+    gaussJordanAlgorithm(&matrix);
+
+    // Matrix sous forme identité avec les resultats à droite.
+
+    // Memory free (very important ofc)
     FreeMatrix(&matrix);
 
     return 0;
@@ -94,15 +99,18 @@ int main(int argc, char *argv[])
 ## 📁 Structure du Projet
 ```graphql
 EquaC
-├── include
-│   ├── equ.h
-│   └── parseCSV.h
-├── equations.csv
+├── matrix.csv
 ├── README.md
+├── include
+│   ├── algebra.h
+│   ├── io.h
+│   ├── matrix.h
+│   └── types.h
 └── src
-│   └── equ.c
+│   └── algebra.c
+│   ├── io.c
 │   ├── main.c
-│   └── parseCSV.c
+│   └── matrix.c
 ```
 ---
 

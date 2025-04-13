@@ -1,24 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "equ.h"
-#include "parseCSV.h"
 
-int main(int argc, char *argv[])
-{
+#include "algebra.h"
+#include "io.h"
+#include "matrix.h"
+#include "types.h"
+
+int main(int argc, char *argv[]) {
     // Exemple de code
-    Matrix matrix;
-    if (GetMatrixFromCSV(&matrix, "matrix.csv")){
+    Matrix_t matrix;
+    if (loadMatrixFromCSV(&matrix, "matrix.csv")) {
         printf("Csv error !\n");
         return 1;
     }
-    printMatrix(matrix);
-    GaussPivot(matrix);
+    printMatrix(&matrix);
+    gaussJordanAlgorithm(&matrix);
     printf("\n");
-    printMatrix(matrix);
-    
-    
+
+    Matrix_t rslt = extractResultPart(&matrix);
+    printMatrix(&rslt);
+
     // Memory free (very important ofc)
-    FreeMatrix(&matrix);
+    freeMatrix(&rslt);
+    freeMatrix(&matrix);
 
     return 0;
 }

@@ -1,2 +1,4 @@
 prog.exe
 /.vscode
+.clang-format
+exit.csv
