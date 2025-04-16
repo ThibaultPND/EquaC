@@ -4,7 +4,7 @@
 #include "types.h"
 
 Matrix_t createMatrix(int rows, int cols, Matrix_t *src);
-void freeMatrix(Matrix_t *matrix);
+void killMatrix(Matrix_t *matrix);
 
 Matrix_t *copyMatrix(Matrix_t *src, Matrix_t *dst);
 

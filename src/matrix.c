@@ -17,11 +17,13 @@ Matrix_t createMatrix(int rows, int cols, Matrix_t *src) {
 
     return matrix;
 }
-void freeMatrix(Matrix_t *matrix) {
+void killMatrix(Matrix_t *matrix) {
     for (int i = 0; i < matrix->nrows; i++) {
         free(matrix->data[i]);
     }
     free(matrix->data);
+    matrix->ncols = 0;
+    matrix->nrows = 0;
 }
 
 Matrix_t *copyMatrix(Matrix_t *src, Matrix_t *dst) {

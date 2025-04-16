@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
     saveMatrixToCSV(&rslt, "exit.csv");
 
     // Memory free (very important ofc)
-    freeMatrix(&rslt);
-    freeMatrix(&matrix);
+    killMatrix(&rslt);
+    killMatrix(&matrix);
 
     return 0;
 }
