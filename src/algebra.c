@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 // Prototypes
-int getFirstPivot(Matrix_t *matrix, int column);
+int getPivotPartiel(Matrix_t *matrix, int column);
 void DivideLineByDouble(double *line, int lenght, double k);
 void RemoveOtherColumnCoefiscent(Matrix_t *matrix, int column);
 void SubstractLineByLineSpecial(double *line_to_substract, double *line, int lenght, int pivot);
@@ -13,7 +14,7 @@ void SubstractLineByLineSpecial(double *line_to_substract, double *line, int len
 // Functions
 int gaussJordanAlgorithm(Matrix_t *matrix) {
     for (int column = 0; column < matrix->ncols - 1; column++) {
-        int pivot = getFirstPivot(matrix, column);
+        int pivot = getPivotPartiel(matrix, column);
         if (pivot == -1) // Pivot introuvable
             return 1;
         else if (pivot > column) {
@@ -26,11 +27,15 @@ int gaussJordanAlgorithm(Matrix_t *matrix) {
     return 0;
 }
 
-int getFirstPivot(Matrix_t *matrix, int column) {
-    int i = column;
-    while (i < matrix->nrows && matrix->data[i][column] == 0)
-        i++;
-    return i;
+int getPivotPartiel(Matrix_t *matrix, int column) {
+    // TODO Essayer avec data[0][column], voir si ça marche aussi
+    int maxi = column;
+    for (int i = column; i < matrix->nrows; i++) {
+        if (fabs(matrix->data[i][column]) > fabs(matrix->data[maxi][column])) {
+            maxi = i;
+        }
+    }
+    return maxi;
 }
 
 int exchangeRows(Matrix_t *matrix, int row1, int row2) {

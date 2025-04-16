@@ -84,7 +84,7 @@ int saveMatrixToCSV(const Matrix_t *matrix, const char *filename) {
 
     for (int i = 0; i < matrix->nrows; i++) {
         for (int j = 0; j < matrix->ncols; j++) {
-            fprintf(file, "%f", matrix->data[i][j]);
+            fprintf(file, "%.3f", matrix->data[i][j]);
             if (j < matrix->ncols - 1) {
                 fprintf(file, ",");
             }

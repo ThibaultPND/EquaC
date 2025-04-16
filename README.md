@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     Matrix_t matrix;
 
     loadMatrixFromCSV(&matrix, "matrix.csv");
-
+    
     // Matrice sous forme de matrice augmentée. Modélisant un système d'équations.
 
     gaussJordanAlgorithm(&matrix);
