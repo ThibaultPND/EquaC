@@ -22,6 +22,7 @@ void killMatrix(Matrix_t *matrix) {
         free(matrix->data[i]);
     }
     free(matrix->data);
+    printf("J'ai libere %d lignes !", matrix->nrows);
     matrix->ncols = 0;
     matrix->nrows = 0;
 }

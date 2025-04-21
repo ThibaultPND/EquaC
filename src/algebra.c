@@ -14,6 +14,7 @@ void SubstractLineByLineSpecial(double *line_to_substract, double *line, int len
 // Functions
 int gaussJordanAlgorithm(Matrix_t *matrix) {
     for (int column = 0; column < matrix->ncols - 1; column++) {
+        // update_progress_bar(column, matrix->ncols);
         int pivot = getPivotPartiel(matrix, column);
         if (pivot == -1) // Pivot introuvable
             return 1;

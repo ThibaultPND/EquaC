@@ -5,5 +5,5 @@
 
 int loadMatrixFromCSV(Matrix_t *matrix, const char *filename);
 int saveMatrixToCSV(const Matrix_t *matrix, const char *filename);
-
+int readTest(Matrix_t *matrix, const char *filename);
 #endif // __IO_H__
