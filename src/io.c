@@ -58,7 +58,7 @@ int saveMatrixToCSV(const Matrix_t *matrix, const char *filename) {
     if (!file) {
         return 1;
     }
-
+    printf("Sauvegarde de la matrice dans %s :\n", filename);
     for (int i = 0; i < matrix->nrows; i++) {
         for (int j = 0; j < matrix->ncols; j++) {
             fprintf(file, "%.3f", matrix->data[i][j]);
@@ -67,6 +67,7 @@ int saveMatrixToCSV(const Matrix_t *matrix, const char *filename) {
             }
         }
         fprintf(file, "\n");
+        updateProgressBar(i + 1, matrix->nrows);
     }
     fclose(file);
     return 0;

@@ -3,8 +3,10 @@
 #include "graphics.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 // Prototypes
 int getPivotPartiel(Matrix_t *matrix, int column);
@@ -25,13 +27,12 @@ int gaussJordanAlgorithm(Matrix_t *matrix) {
         }
         DivideLineByDouble(matrix->data[pivot], matrix->ncols, matrix->data[pivot][column]);
         RemoveOtherColumnCoefiscent(matrix, column);
-        updateProgressBar(column+1, matrix->ncols);
+        updateProgressBar(column + 2, matrix->ncols);
     }
     return 0;
 }
 
 int getPivotPartiel(Matrix_t *matrix, int column) {
-    // TODO Essayer avec data[0][column], voir si ça marche aussi
     int maxi = column;
     for (int i = column; i < matrix->nrows; i++) {
         if (fabs(matrix->data[i][column]) > fabs(matrix->data[maxi][column])) {
@@ -80,18 +81,77 @@ int transposeMatrix(Matrix_t *matrix) {
             matrix->data[j][i] = matrix->data[i][j];
     return 0;
 }
+/*
+Complexity : 0-3
+*/
+Matrix_t *generateAugmentedMatrix(int nrows, short complexity) {
+    Matrix_t *matrix = createMatrix(nrows, nrows + 1, NULL);
+    if (!matrix)
+        return NULL;
 
-Matrix_t extractMatrixPart(Matrix_t *src) {
-    Matrix_t matrix = createMatrix(src->nrows, src->ncols - 1, NULL);
-    for (int i = 0; i < matrix.ncols; i++) {
-        memcpy(matrix.data[i], src->data[i], matrix.ncols * sizeof(double));
+    // Solution connue
+    int *solution = (int *) malloc(nrows * sizeof(int));
+    if (!solution)
+        return NULL;
+
+    for (int i = 0; i < nrows; i++) {
+        solution[i] = (i + 1) * (complexity + 1); // Solution croissante ou contrôlée
+    }
+
+    printf("Génération de la matrice augmentée %d (complexité %d)\n", nrows, complexity);
+
+    srand(time(NULL));
+
+    for (int i = 0; i < nrows; i++) {
+        double sum = 0.0;
+
+        for (int j = 0; j < nrows; j++) {
+            double coef = 0.0;
+
+            switch (complexity) {
+            case 0: // Simple coefficients
+                coef = (i == j) ? 1.0 : 0.0;
+                break;
+            case 1: // Linéaire
+                coef = j + 1;
+                break;
+            case 2: // Random entre 0 et 9
+                coef = (rand() % 10) + 1;
+                break;
+            case 3: // Random flottant entre -5 et +5
+                coef = ((double) (rand() % 1001) / 100.0) - 5.0;
+                break;
+            default:
+                coef = (double) (rand() % 10);
+                break;
+            }
+
+            matrix->data[i][j] = coef;
+            sum += coef * solution[j];
+        }
+
+        // Dernière colonne = résultat
+        matrix->data[i][nrows] = sum;
+
+        if (complexity >= 2)
+            updateProgressBar(i + 1, nrows);
+    }
+
+    free(solution);
+    return matrix;
+}
+
+Matrix_t *extractMatrixPart(Matrix_t *src) {
+    Matrix_t *matrix = createMatrix(src->nrows, src->ncols - 1, NULL);
+    for (int i = 0; i < matrix->ncols; i++) {
+        memcpy(matrix->data[i], src->data[i], matrix->ncols * sizeof(double));
     }
     return matrix;
 }
-Matrix_t extractResultPart(Matrix_t *matrix) {
-    Matrix_t returned_matrix = createMatrix(matrix->nrows, 1, NULL);
+Matrix_t *extractResultPart(Matrix_t *matrix) {
+    Matrix_t *returned_matrix = createMatrix(matrix->nrows, 1, NULL);
     for (int i = 0; i < matrix->nrows; i++) {
-        returned_matrix.data[i][0] = matrix->data[i][matrix->ncols - 1];
+        returned_matrix->data[i][0] = matrix->data[i][matrix->ncols - 1];
     }
 
     return returned_matrix;
