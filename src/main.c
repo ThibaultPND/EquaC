@@ -11,16 +11,19 @@
 int main(int argc, char *argv[]) {
     srand(time(NULL));
     // Exemple de code
+
     Matrix_t matrix = {NULL, 0, 0};
-    if (loadMatrixFromCSV(&matrix, "matrix.csv")) {
+    clock_t start = clock();
+    if (loadMatrixFromCSV(&matrix, "equations_hard.csv")) {
         printf("Csv error !\n");
         return 1;
     }
+    printf("Time spent : %ld clock units\n", (clock() - start));
     // shuffleSort(matrix.data, matrix.nrows);
 
-    // clock_t start = clock();
-    // gaussJordanAlgorithm(&matrix);
-    // printf("Time spent : %ld\n", (clock() - start) / CLOCKS_PER_SEC);
+    start = clock();
+    gaussJordanAlgorithm(&matrix);
+    printf("Time spent : %ld clock units\n", (clock() - start));
 
     // Matrix_t rslt = extractResultPart(&matrix);
     // saveMatrixToCSV(&rslt, "exit.csv");

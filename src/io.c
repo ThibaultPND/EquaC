@@ -40,7 +40,6 @@ int loadMatrixFromCSV(Matrix_t *matrix, const char *filename) {
     size_t size;
     printf("Chargement de la matrice depuis le fichier CSV :\n");
     while (my_getline(&buffer, &size, file) != -1) {
-        updateProgressBar(line, matrix->nrows);
         matrix->data[line] = (double *) malloc(matrix->ncols * sizeof(double));
         char *token = strtok(buffer, ",");
         for (int col = 0; col < matrix->ncols && token != NULL; col++) {
@@ -48,6 +47,7 @@ int loadMatrixFromCSV(Matrix_t *matrix, const char *filename) {
             token = strtok(NULL, ",");
         }
         line++;
+        updateProgressBar(line, matrix->nrows);
     }
     free(buffer);
     fclose(file);

@@ -3,21 +3,24 @@
 
 #include "graphics.h"
 
+#define BAR_WIDTH 50
+
 void updateProgressBar(int current, int total) {
     static clock_t last_call = 0;
     clock_t now = clock();
 
-    if (now - last_call < 500) {
-        return;
-    }
+    static int filled = 0;
+    float ratio = (float) current / total;
+    filled = (int) (ratio * BAR_WIDTH);
+
+    if (now - last_call < 500)
+        if (filled < (BAR_WIDTH - 1))
+            return;
 
     last_call = now;
-    int width = 50;
-    float ratio = (float) current / total;
-    int filled = (int) (ratio * width);
 
     printf("\r[");
-    for (int i = 0; i < width; i++) {
+    for (int i = 0; i < BAR_WIDTH; i++) {
         if (i <= filled)
             printf("=");
         else
@@ -25,4 +28,6 @@ void updateProgressBar(int current, int total) {
     }
     printf("] %3d%%", (int) (ratio * 100));
     fflush(stdout);
+    if ((int) ratio)
+        printf("\n");
 }
