@@ -16,6 +16,7 @@ void SubstractLineByLineSpecial(double *line_to_substract, double *line, int len
 
 // Functions
 int gaussJordanAlgorithm(Matrix_t *matrix) {
+    clock_t start = clock();
     printf("Lancement de l'algorithme Gauss Jordan sur la matrice :\n");
     for (int column = 0; column < matrix->ncols - 1; column++) {
         int pivot = getPivotPartiel(matrix, column);
@@ -27,7 +28,7 @@ int gaussJordanAlgorithm(Matrix_t *matrix) {
         }
         DivideLineByDouble(matrix->data[pivot], matrix->ncols, matrix->data[pivot][column]);
         RemoveOtherColumnCoefiscent(matrix, column);
-        updateProgressBar(column + 2, matrix->ncols);
+        updateProgressBar(column + 2, matrix->ncols, start);
     }
     return 0;
 }
@@ -85,6 +86,7 @@ int transposeMatrix(Matrix_t *matrix) {
 Complexity : 0-3
 */
 Matrix_t *generateAugmentedMatrix(int nrows, short complexity) {
+    clock_t start = clock();
     Matrix_t *matrix = createMatrix(nrows, nrows + 1, NULL);
     if (!matrix)
         return NULL;
@@ -134,7 +136,7 @@ Matrix_t *generateAugmentedMatrix(int nrows, short complexity) {
         matrix->data[i][nrows] = sum;
 
         if (complexity >= 2)
-            updateProgressBar(i + 1, nrows);
+            updateProgressBar(i + 1, nrows, start);
     }
 
     free(solution);

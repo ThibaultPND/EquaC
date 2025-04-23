@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     // Exemple de code
 
     clock_t start = clock();
-    Matrix_t *matrix = generateAugmentedMatrix(100, 3);
+    Matrix_t *matrix = generateAugmentedMatrix(2000, 3);
     printf("Time spent : %ld clock units\n", (clock() - start));
 
     start = clock();

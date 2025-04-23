@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "io.h"
 #include "matrix.h"
@@ -16,6 +17,7 @@ int my_getline(char **lineptr, size_t *n, FILE *file); // getline() est dispo qu
 // Functions
 
 int loadMatrixFromCSV(Matrix_t *matrix, const char *filename) {
+    clock_t start = clock();
     FILE *file = fopen(filename, "r");
     if (!file) {
         perror("Erreur lors de l'ouverture du fichier csv\n");
@@ -47,13 +49,14 @@ int loadMatrixFromCSV(Matrix_t *matrix, const char *filename) {
             token = strtok(NULL, ",");
         }
         line++;
-        updateProgressBar(line, matrix->nrows);
+        updateProgressBar(line, matrix->nrows, start);
     }
     free(buffer);
     fclose(file);
     return 0;
 }
 int saveMatrixToCSV(const Matrix_t *matrix, const char *filename) {
+    clock_t start = clock();
     FILE *file = fopen(filename, "w");
     if (!file) {
         return 1;
@@ -67,7 +70,7 @@ int saveMatrixToCSV(const Matrix_t *matrix, const char *filename) {
             }
         }
         fprintf(file, "\n");
-        updateProgressBar(i + 1, matrix->nrows);
+        updateProgressBar(i + 1, matrix->nrows, start);
     }
     fclose(file);
     return 0;
