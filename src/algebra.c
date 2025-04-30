@@ -3,6 +3,7 @@
 #include "graphics.h"
 
 #include <stdio.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -16,27 +17,31 @@ void SubstractLineByLineSpecial(double *line_to_substract, double *line, int len
 
 // Functions
 int gaussJordanAlgorithm(Matrix_t *matrix) {
-    clock_t start = clock();
-    printf("Lancement de l'algorithme Gauss Jordan sur la matrice :\n");
     for (int column = 0; column < matrix->ncols - 1; column++) {
+
         int pivot = getPivotPartiel(matrix, column);
-        if (pivot == -1) // Pivot introuvable
+        if (pivot == -1)
             return 1;
-        else if (pivot > column) {
+        else if (pivot > column)
             exchangeRows(matrix, pivot, column);
-            pivot = column;
-        }
-        DivideLineByDouble(matrix->data[pivot], matrix->ncols, matrix->data[pivot][column]);
+
+        DivideLineByDouble(matrix->data[column], matrix->ncols, matrix->data[column][column]);
         RemoveOtherColumnCoefiscent(matrix, column);
-        updateProgressBar(column + 2, matrix->ncols, start);
     }
     return 0;
 }
 
 int getPivotPartiel(Matrix_t *matrix, int column) {
     int maxi = column;
-    for (int i = column; i < matrix->nrows; i++) {
-        if (fabs(matrix->data[i][column]) > fabs(matrix->data[maxi][column])) {
+    double max_value = fabs(matrix->data[maxi][column]);
+    for (int i = column + 1; i < matrix->nrows; i++) {
+        if (max_value != 0) {
+            return maxi;
+        }
+
+        double value = fabs(matrix->data[i][column]);
+        if (value > max_value) {
+            max_value = value;
             maxi = i;
         }
     }
@@ -55,6 +60,7 @@ int exchangeRows(Matrix_t *matrix, int row1, int row2) {
     return 0;
 }
 void DivideLineByDouble(double *line, int lenght, double k) {
+#pragma omp parallel for
     for (int i = 0; i < lenght; i++) {
         line[i] /= k;
     }
@@ -62,10 +68,11 @@ void DivideLineByDouble(double *line, int lenght, double k) {
 
 void RemoveOtherColumnCoefiscent(Matrix_t *matrix, int column) {
     int pivot = column;
+#pragma omp parallel for
     for (int line = 0; line < matrix->nrows; line++) {
-        if (line == pivot)
-            continue;
-        SubstractLineByLineSpecial(matrix->data[line], matrix->data[pivot], matrix->ncols, pivot);
+        if (line != pivot)
+            SubstractLineByLineSpecial(matrix->data[line], matrix->data[pivot], matrix->ncols,
+                                       pivot);
     }
 }
 void SubstractLineByLineSpecial(double *line_to_substract, double *line, int lenght, int pivot) {
